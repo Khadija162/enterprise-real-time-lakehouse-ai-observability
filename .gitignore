@@ -1,0 +1,29 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+# Local databases and logs
+*.db
+*.sqlite
+*.sqlite3
+*.log
+# Data outputs / cloud exports / local checkpoints
+data/processed/
+data/streaming/
+lakehouse/
+checkpoints/
+monitoring/reports/
+ai_observability/investigations/
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
