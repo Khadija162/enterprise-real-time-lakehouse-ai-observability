@@ -1,0 +1,9 @@
+order_id,customer_id,product,amount
+101,1,Laptop,1200
+102,2,Phone,800
+103,3,Keyboard,100
+104,4,Monitor,
+105,5,Mouse,50
+102,2,Phone,800
+106,6,Tablet,-300
+107,7,Headphones,150
