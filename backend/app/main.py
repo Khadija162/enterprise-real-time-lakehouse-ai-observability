@@ -8,7 +8,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from .services.llama import analyze_incident
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 DB_FILE = Path(os.getenv("MONITORING_DB", str(ROOT / "monitoring" / "monitoring.db")))
 app = FastAPI(title="Lakehouse Control Center", version="0.2.0")
 
