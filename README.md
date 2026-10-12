@@ -1,68 +1,79 @@
 # Enterprise Real-Time Lakehouse with AI Data Observability
 
-A beginner-friendly, learning-to-production data engineering project covering Python ETL, data quality, PostgreSQL, Spark, Delta Lake, Kafka, monitoring and AI incident triage.
+An **Azure-ready full-stack data engineering portfolio project** combining Python ETL, data-quality monitoring, a FastAPI control plane, a Next.js dashboard and **Meta Llama** incident triage.
 
-> **Current repository status:** Starter implementation. The Python/Pandas ETL, quarantined records, quality rules and unit tests are included and runnable. Later lessons (PostgreSQL, Kafka, Delta, AI) are documented in the roadmap but their code is **not yet included**.
+> **Implementation status:** The Python/Pandas ETL and quality rules, FastAPI API, minimal Next.js dashboard, mocked AI service, tests, and an Azure Terraform example are implemented. Full Kafka/Event Hubs ingestion, Databricks/Delta deployment, cloud PostgreSQL, authentication and live Llama deployment are planned — not yet running in Azure.
 
-## Architecture roadmap
+## Architecture
 
 ```text
-Source CSV / databases / Kafka
-            ↓
-      Python / streaming ingestion
-            ↓
-        Bronze (raw)
-            ↓
-    Validation + rejected records
-            ↓
-       Silver (clean data)
-            ↓
-       Gold (analytics)
-            ↓
-      Metrics + alerts
-            ↓
- AI investigation (human reviewed)
+Synthetic e-commerce data
+  -> Python ETL (implemented) / Azure Event Hubs (planned)
+  -> Spark + Delta Bronze / Silver / Gold (planned cloud integration)
+  -> Monitoring database (Lesson 9 integration expected)
+  -> FastAPI API -> Next.js dashboard
+                -> Llama incident triage (mock by default / Azure endpoint optional)
 ```
 
-## Run locally on Windows
+See [Azure deployment plan](docs/azure-deployment.md) and [architecture notes](docs/architecture.md).
 
-Requires Python 3.11 or 3.12. Open PowerShell inside the project folder:
+## Windows quick start
+
+### Python ETL and tests
 
 ```powershell
 py -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt -r backend/requirements.txt
 .\.venv\Scripts\python.exe pipelines\etl_pipeline.py
-.\.venv\Scripts\python.exe -m pytest -q
+.\.venv\Scripts\python.exe -m pytest tests backend/tests -q
 ```
 
-Sample results are written to `data/processed/`, which is excluded from Git.
+### FastAPI (terminal 1)
 
-## Included files
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn backend.app.main:app --reload
+```
 
-- `pipelines/etl_pipeline.py`: CSV extraction, validation and clean/rejected outputs
-- `monitoring/quality_rules.py`: quality metrics and alert thresholds
-- `tests/`: automated Python tests
-- `data/raw/orders.csv`: synthetic eight-row example
-- `docs/architecture.md`: architecture notes
-- `.gitignore`: protects local credentials, generated data and checkpoints
+Open http://127.0.0.1:8000/docs for API docs. If you haven't completed Lesson 9, metrics and alerts are empty (not fabricated).
 
-## Roadmap
+### Next.js (terminal 2)
 
-- [x] Batch ETL in Pandas with quarantined invalid records
-- [x] Data-quality rules and tests
-- [ ] PostgreSQL UPSERT + run history
-- [ ] PySpark + Bronze/Silver/Gold Parquet
-- [ ] Delta Lake MERGE and history
-- [ ] Docker/Kafka producer and consumer
-- [ ] Spark Structured Streaming and checkpoints
-- [ ] Observability metrics and incident reporting
-- [ ] Read-only AI incident analysis
-- [ ] CI/CD, cloud deployment, security and performance testing
+Requires a recent supported Node.js LTS release. From repository root:
 
-## Safety
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-Only synthetic example data belongs in this repository. Never commit API keys, passwords, customer data, local databases, generated Parquet/Delta datasets or checkpoints.
+Open http://localhost:3000. Server-side Next.js reads backend from `API_BASE_URL` (defaults to http://127.0.0.1:8000).
 
-## License
+### AI incident analyzer
 
-MIT. See [LICENSE](LICENSE).
+By default `LLAMA_MODE=mock` and **no Azure API key is required**. POST `/api/ai/analyze` with a real `run_id` recorded in the monitoring SQLite database. For a real Foundry deployment set `LLAMA_MODE=azure`, `AZURE_LLAMA_ENDPOINT`, `AZURE_LLAMA_MODEL` and `AZURE_LLAMA_API_KEY` **server-side**. Confirm that your endpoint supports an OpenAI-compatible chat completions API and the deployed model is available in your region.
+
+**Security:** The sample API has no authentication; run on localhost only. Do not publish this backend or sensitive pipeline details on a public host until authentication/authorization and data sanitization are implemented.
+
+## Project folders
+
+- `backend/` — FastAPI routes and mockable Llama adapter
+- `frontend/` — Next.js status dashboard
+- `pipelines/` — ETL starter
+- `monitoring/` — reusable data-quality calculations
+- `infrastructure/terraform/` — small Azure resource-group and ADLS example; **not** a full deployment
+- `tests/`, `backend/tests/` — tests
+- `docs/` — architecture and Azure deployment guidance
+
+## Remaining milestones
+
+- [x] Batch ETL and tests
+- [x] Backend API and dashboard skeleton
+- [x] Mock AI incident triage
+- [x] CI workflow and starter Azure IaC
+- [ ] Wire actual monitoring metrics and alert history
+- [ ] Kafka/Event Hubs + Spark/Delta integration
+- [ ] Azure PostgreSQL and identity management
+- [ ] Deploy Llama via Microsoft Foundry
+- [ ] Authentication, performance testing, and production hardening
+
+MIT license. Use synthetic records only; credentials and generated data are ignored by Git.
